@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+  <meta charset="UTF-8">
+  <link rel="shortcut icon" href="img/bank.jpg"/>
+  <title>BANKKU</title>
+  <link rel="shortcut icon" href="img/bank.jpg"/>
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="css/style.css" media="screen" type="text/css" />
+  <!-- <script src="setServer.js"></script> -->
+  <script src="js/jquery-2.1.1.min.js"></script>
+	<script src="js/bootstrap.js"></script>
+	<script src="js/funcNumber.js"></script>
+	<script src="js/md5.js"></script>
+	<script src="setServer.js"></script>
+ 
+<script>
+
+	function funcSignin()
+{
+	var log = $_GET('log');
+	// variable user dan pass menyimpan username(id) dan password (id) dari user yang menginput
+	var pin = document.getElementById("pin").value;
+	var pass = document.getElementById("password").value;
+	
+	// variable sstatus untuk mengecek data array 
+	var sStatus;
+	var nrk;
+	var apiKey;
+	// variable url menyimpan url server untuk diakses oleh client ->server menggunakan json dan ajax,untuk mengecek username dan password ada atau tidak nya. Password menggunakan enkripsi md5 untuk mengakses.
+	// alert('server : '+server+ ' pin : '+pin+' Pass : ' + pass);
+	var urls = "http://18.235.150.206/platformbank/api/banking/users?pin="+pin+"&password="+pass;
+
+	// alert(urls);
+	// var urls = "https://bankku.yippytech.com/sister_server/JSON/serviceJSON_login.php?pin=123456&password=e10adc3949ba59abbe56e057f20f883e";
+	if (pin == "" || pass == "") {
+		alert("masukkan alamat pin dan password")
+	}else{
+		$.ajax({
+		type: 'GET',
+		url: urls,
+		dataType: 'json',
+		cache: false,
+		// kalo emang ada datanya maka status menjadi ok dari perulangan yang mencari data username dan password yg sesuai. data akan disimpan di session dengan nama username, dan user akan berpindah kehalaman home.html
+			success: function(msg){	
+				
+				// alert(msg);
+				// for(i=0;i<msg.data.object.length;i++){
+					sStatus = msg.action;			
+					nrk = msg.response[0].noRekening;
+					apiKey = msg.response[0].apiKey;
+					// console.log(nrk)	
+					// sessionPin = msg.data.object[i].pin;			
+					if(sStatus == "success")
+					{
+						sessionStorage.setItem("pin",pin);
+						sessionStorage.setItem("norek",nrk);
+						sessionStorage.setItem('apiKey',apiKey);
+						// var sPin = sessionStorage.getItem("pin",pin);
+						// alert(sPin);
+						window.location.href='menu.html';
+					} else 
+			// jika tidak ada maka username dan password kosong maka tampil errmodal atau alert jika username password tidak sesuai.		
+					{
+						$("#errModal").modal();					
+						document.getElementById('pin').value = "";	
+						document.getElementById('password').value = "";	
+			// focus () artinya , fokus ke username yg diinputkan
+						document.getElementById("password").focus(); 			
+					}
+				// }
+			}
+		});
+	}	
+}
+
+function $_GET(q,s) {
+    s = (s) ? s : window.location.search;
+    var re = new RegExp('&amp;'+q+'=([^&amp;]*)','i');
+    return (s=s.replace(/^\?/,'&amp;').match(re)) ?s=s[1] :s='';
+}
+
+</script>
+</head>
+<body>
+<!-- <script type="text/javascript" src="cordova.js"></script> -->
+  <div class="wrap">
+  		<div style="font-size:20px; font-family:arial; "><center><h1>BANKKU</h1></center>
+		<div class="avatar">
+      <img src="img/bank.jpg">
+		</div>
+		</div>
+		<form id="form_id" name="myform">
+			<input type="text" name="pin"  id="pin" placeholder="PIN" required>
+			<div class="bar">
+				<i></i>
+			</div>
+			<input type="password" name="password" id="password" placeholder="password" required>
+			<a href="" class="forgot_link">forgot ?</a>
+			<div class="container-login100-form-btn m-t-17">
+			<button type="button" class="login100-form-btn" id="signin" onclick="funcSignin()">
+							Login
+			</button>			
+			</div>
+		</form> 
+		<div class="modal fade" id="errModal" role="dialog">
+						<div class="modal-dialog">	
+							<!-- Modal content-->
+							<div class="modal-content">
+								<div class="modal-header">
+								  <button type="button" class="close" data-dismiss="modal">&times;</button>
+								  <h4 class="modal-title" >Alert</h4>
+								</div>
+								<div class="modal-body">
+								  <p>Sign in gagal. Pin dan Password Salah! Silahkan coba lagi</p>
+								</div>
+								<div class="modal-footer">
+								  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+								</div>
+							</div>
+						</div>
+					</div>
+	</div>
+  <script src="js/index.js"></script>
+
+</body>
+
+</html>
